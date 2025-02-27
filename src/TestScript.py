@@ -1,0 +1,65 @@
+ To create an automated UI test using Python and Playwright, follow this example code:
+
+Create a file named `src/testscript.py` with the following content:
+
+```python
+from typing import Callable
+import time
+import playwright
+
+class LoginPage:
+    def __init__(self, page):
+        self.page = page
+
+    async def login(self):
+        # Add your custom login implementation here
+        pass
+
+class ForecastExplorerUI:
+    def __init__(self, page: playwright.async_api.Page):
+        self.page = page
+
+    @staticmethod
+    async def click_element(selector: str) -> None:
+        await page.click(selector)
+
+    @staticmethod
+    async def wait_for_visible(selector: str) -> bool:
+        return await page.wait_for_selector(selector)
+
+    async def test_forecast_explorer_ui(self):
+        # Login to the website
+        login = LoginPage(self.page)
+        await login.login()
+
+        # Click on Feature Store Icon and Feature Store Text
+        await self.click_element("span.sc-irPVuy.fYDalG")
+        await self.click_element("//span[normalize-space()='Feature Store']")
+
+        # Wait for Launch Feature Job button to visible
+        is_visible = await self.wait_for_visible("(//button[normalize-space()="Launch Feature Job"])[1]")
+        assert is_visible, "Launch Feature Job button not found"
+
+        # Click on Launch Feature Job Button
+        await self.click_element("(//button[normalize-space()="Launch Feature Job"])[1]")
+
+        # Wait for Job Selector button to visible
+        is_visible = await self.wait_for_visible("button.sc-blHHSb.dxiEPq")
+        assert is_visible, "Job Selector button not found"
+
+if __name__ == "__main__":
+    with playwright.sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        page = await browser.new_page()
+
+        # Run the test function
+        test = ForecastExplorerUI(page)
+        test.test_forecast_explorer_ui()
+
+        # Close the browser after the test is done
+        await browser.close()
+```
+
+In this example, we created two classes: `LoginPage` and `ForecastExplorerUI`. The `LoginPage` class is responsible for handling the login functionality of the application, while the `ForecastExplorerUI` class contains the UI test function.
+
+The test function tests if the "Feature Store Icon", "Feature Store Text", and "Launch Feature Job" button are clickable. After clicking these elements, it waits for the "Job Selector" button to appear and verifies that it is visible on the page. The script uses `playwright.sync_playwright()` to launch a headless browser in non-headless mode and runs the test function using the `test_forecast_explorer_ui()`.
